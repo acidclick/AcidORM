@@ -21,11 +21,11 @@ class Result extends Nette\Object{
 		$data = [];
 		foreach ($this->result as $columnName => $columnValue) {
 			if(preg_match('/^'.$alias.'_([^$]+)$/', $columnName, $regs)){
-				$data[$regs[1]] = $columnValue;
+				if($columnValue !== null) $data[$regs[1]] = $columnValue;
 			}
 		}
 		if(sizeof($data)>0) return $data;
-		return false;
+		return null;
 
 	}
 

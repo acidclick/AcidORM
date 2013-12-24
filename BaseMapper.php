@@ -25,10 +25,10 @@ class BaseMapper extends Nette\Object{
 	}
 
 	public function toArray(BaseObject $object){
-		$reflection = $this->object->getReflection();
 		$array = [];
+		$reflection = $this->object->getReflection();		
 		foreach($reflection->getProperties() as $property){
-			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('oneToMany') && !$property->hasAnnotation('manyToMany')){
+			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('oneToMany') && !$property->hasAnnotation('manyToMany') && !$property->hasAnnotation('dontMap')){
 				if($object->{$property->name} !== null) $array[$property->name] = $object->{$property->name};	
 			}
 			
@@ -37,6 +37,7 @@ class BaseMapper extends Nette\Object{
 	}
 
 	public function map($data){
+		if(sizeof($data) === 0) return null;
 		$object = clone $this->object;
 		$reflection = $object->getReflection();
 		foreach($data as $property => $value){
@@ -54,7 +55,7 @@ class BaseMapper extends Nette\Object{
 	public function getColumns($alias){
 		$columns = [];
 		foreach($this->object->getReflection()->getProperties() as $property){
-			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('manyToMany') && !$property->hasAnnotation('oneToMany')){
+			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('manyToMany') && !$property->hasAnnotation('oneToMany') && !$property->hasAnnotation('dontMap')){
 				$columns[$alias . '.' . $property->name] =  $alias . '_' . $property->name;
 			}
 		}		
@@ -88,7 +89,8 @@ class BaseMapper extends Nette\Object{
 					$annotation = $property->getAnnotation('oneToOne');
 					$oneToOne = new DB\Relationships\OneToOne(
 						$annotation['className'],
-						$annotation['propertyName']
+						$annotation['propertyName'],
+						isset($annotation['canBeNull']) ? $annotation['canBeNull'] : false
 					);
 					$this->oneToOneRelations[$property->name] = $oneToOne;
 				}

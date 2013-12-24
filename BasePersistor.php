@@ -11,7 +11,9 @@ class BasePersistor extends Nette\Object{
 	private $mapper;
 	private $table;
 
-	private $mapperManager;
+	private $mapperManager;	
+
+	private $cache;
 
 	public function __construct($db, $mapperManager){
 		$this->db = $db;
@@ -19,7 +21,7 @@ class BasePersistor extends Nette\Object{
 
 		if(preg_match('/\\\([a-zA-Z]+)Persistor$/', $this->getReflection()->name, $regs)){
 			$class = 'Model\\Data\\'.$regs[1];
-			$this->object = new $class();
+			$this->object = new $class;
 			$this->table = $regs[1];
 			$this->mapper = $this->mapperManager->getMapper($regs[1]);
 		}
@@ -27,6 +29,10 @@ class BasePersistor extends Nette\Object{
 
 	public function getDb(){
 		return $this->db;
+	}
+
+	public function setDb($db){
+		$this->db = $db;
 	}
 
 	public function getMapperManager(){
@@ -53,7 +59,7 @@ class BasePersistor extends Nette\Object{
 	}
 
 	public function delete($id){
-		$this->db->delete($this->mapper->table)->where('id = %i', $id);
+		$this->db->delete($this->mapper->table)->where('id = %i', $id)->execute();
 	}
 
 	public function getById($id, $withDependencies = false, $dependencies = null){
@@ -92,7 +98,7 @@ class BasePersistor extends Nette\Object{
 		if($withDependencies) $dependencies = $this->getDependencies($dependencies);
 
 		$q = $this->createQuery($withDependencies, $dependencies);
-		$q = $q->where('[object].['.$propertyName.'] = %s', $propertyValue);
+		$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);	
 
 		if($q->count('*') > 0){
 			return $this->map($q->fetch(), $withDependencies, $dependencies);
@@ -101,15 +107,37 @@ class BasePersistor extends Nette\Object{
 		return null;		
 	}
 
-	public function getAllByProperty($propertyName, $propertyValue, $withDependencies = false, $dependencies = null){
+	public function getByProperties($properties, $withDependencies = false, $dependencies = null){
 		if($withDependencies) $dependencies = $this->getDependencies($dependencies);
-		
-		$objects = [];
 
-		$q = $this->createQuery($withDependencies, $dependencies)
-				  ->where('[object].['.$propertyName.'] = %s', $propertyValue);
+		$q = $this->createQuery($withDependencies, $dependencies);
+		foreach($properties as $propertyName => $propertyValue){
+			$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);	
+		}
+		
 
 		if($q->count('*') > 0){
+			return $this->map($q->fetch(), $withDependencies, $dependencies);
+		}
+
+		return null;		
+	}	
+
+	public function getAllByProperty($propertyName, $propertyValue, $withDependencies = false, $dependencies = null, $limit = null, $offset = null, &$count = null, $orderBy = null,  $direction = 0){
+		if($withDependencies) $dependencies = $this->getDependencies($dependencies);
+		$objects = [];
+
+		$q = $this->createQuery($withDependencies, $dependencies);
+		$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);
+		if($orderBy){
+			$q = $q->orderBy('[' . $orderBy . '] ' . ($direction ? 'desc' : 'asc'));
+		}
+		$count = $q->count('*');
+
+		if($limit !== null) $q = $q->limit($limit);
+		if($offset !== null) $q = $q->offset($offset);			
+
+		if($count  > 0){
 			foreach($q as $r){
 				$objects[] = $this->map($r, $withDependencies, $dependencies);
 			}
@@ -118,6 +146,33 @@ class BasePersistor extends Nette\Object{
 
 		return $objects;
 	}
+
+	public function getAllByProperties($properties, $withDependencies = false, $dependencies = null, $limit = null, $offset = null, &$count = null, $orderBy = null, $direction = null){
+		if($withDependencies) $dependencies = $this->getDependencies($dependencies);
+		$objects = [];
+
+		$q = $this->createQuery($withDependencies, $dependencies);
+		foreach($properties as $propertyName => $propertyValue){
+			$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);
+		}
+		if($orderBy){
+			$q = $q->orderBy($orderBy . ' ' . ($direction === 1 ? 'desc' : 'asc'));
+		}
+
+		$count = $q->count('*');
+
+		if($limit !== null) $q = $q->limit($limit);
+		if($offset !== null) $q = $q->offset($offset);			
+
+		if($count  > 0){
+			foreach($q as $r){
+				$objects[] = $this->map($r, $withDependencies, $dependencies);
+			}
+
+		}
+
+		return $objects;
+	}	
 
 	public function getAllForOneToMany(DB\Relationships\OneToMany $oneToMany, $value, $withDependencies = false, $dependencies = null){
 		return $this->getAllByProperty($oneToMany->propertyName, $value, $withDependencies, $dependencies);
@@ -129,8 +184,8 @@ class BasePersistor extends Nette\Object{
 		$objects = [];
 
 		$q = $this->createQuery($withDependencies, $dependencies)
-				  ->join('['.$table.'] [rel1]')->on(sprintf('[object].[id] = [rel1].[%s]', $manyToMany->foreignKey))
-				  ->where(sprintf('[rel1].[%s] = %%s', $manyToMany->column), $manyToMany->value);
+				  ->join('['.$manyToMany->table.'] [rel1]')->on(sprintf('[object].[id] = [rel1].[%s]', $manyToMany->foreignKey))
+				  ->where(sprintf('[rel1].[%s] = %%s', $manyToMany->column), $value);
 
 		if($q->count('*') > 0){
 			foreach($q as $r){
@@ -147,6 +202,7 @@ class BasePersistor extends Nette\Object{
 		$object = $this->mapper->map($result->getAliasData('object'));
 		if($withDependencies){
 			foreach($dependencies as $property => $dependency){
+				$aliasData = $result->getAliasData($property);
 				$dependencyObject = $this->mapperManager->getMapper($dependency->className)->map($result->getAliasData($property));
 				$object->$property = $dependencyObject;
 			}
@@ -168,7 +224,11 @@ class BasePersistor extends Nette\Object{
 			$property = $this->object->getReflection()->getProperty($propertyName);
 			if($property->hasAnnotation('oneToOne')){
 				$annotation = $property->getAnnotation('oneToOne');
-				$data[$propertyName] = new DB\Relationships\OneToOne($annotation['className'], $annotation['propertyName']);
+				$data[$propertyName] = new DB\Relationships\OneToOne(
+					$annotation['className'], 
+					$annotation['propertyName'], 
+					isset($annotation['canBeNull']) ? $annotation['canBeNull'] : false
+				);
 			}
 		}
 		return $data;
@@ -181,16 +241,61 @@ class BasePersistor extends Nette\Object{
 				$columns = array_merge($columns, $this->mapperManager->getMapper($dependency->className)->getColumns($propertyName));
 			}
 		}
+
 		$q = $this->db->select($columns)
 					  ->from(sprintf('[%s] [%s]', $this->mapper->getTable(), 'object'));
+
 		if($withDependencies){
 			foreach($dependencies as $property => $dependency){
 				$table = $this->mapperManager->getMapper($dependency->className)->getTable();
 				$alias = $property;
-				$q = $q->join(sprintf('[%s] [%s]', $table, $alias))
-					   ->on(sprintf('[%s].[%s] = [%s].[%s]', $alias, 'id', 'object', $dependency->propertyName));
+				if($dependency->canBeNull){
+					$q = $q->leftJoin(sprintf('[%s] [%s]', $table, $alias))
+						   ->on(sprintf('[%s].[%s] = [%s].[%s]', $alias, 'id', 'object', $dependency->propertyName));
+				} else {
+					$q = $q->join(sprintf('[%s] [%s]', $table, $alias))
+						   ->on(sprintf('[%s].[%s] = [%s].[%s]', $alias, 'id', 'object', $dependency->propertyName));
+				}
+
 			}
 		}
+
 		return $q;
 	}
+
+	public function setCache(Nette\Caching\Cache $cache)
+	{
+		$this->cache = $cache;
+	}
+
+	public function getCache()
+	{
+		return $this->cache;
+	}	
+
+	public function getKeyValuePairs($key = 'id', $value = 'name')
+	{
+		$q = $this->db->select(sprintf('[%s], [%s]', $key, $value))
+					  ->from($this->mapper->table);
+					  
+		return $q->fetchPairs($key, $value);
+	}
+
+	public function getKeyHierarchy($key = 'id', $parent = 'parent')
+	{	
+		$data = [];
+
+		$this->getHierarchy($data, $key, $parent);
+
+		return $data;
+	}
+
+	public function getHierarchy(&$data, $key, $parentKey = 'parent', $parent = 0)
+	{
+		foreach($this->getAllByProperty($parentKey, $parent) as $object){
+			$children = [];
+			$this->getHierarchy($children, $key, $parentKey, $object->{$key}, $object->{$parentKey});
+			$data[$object->{$key}] = $children;
+		}		
+	}	
 }
