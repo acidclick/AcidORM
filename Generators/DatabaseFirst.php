@@ -61,4 +61,7 @@ class DatabaseFirst extends Nette\Object implements IDatabaseFirst{
 		$this->adapter->createAll();
 	}
 
+
+
+
 }
