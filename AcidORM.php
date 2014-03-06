@@ -116,7 +116,7 @@ class AcidORM extends Nette\Object{
     		return $grid;
     	}
 
-    	parent::__get($name);
+    	return parent::__get($name);
     }
 
     public function getFacadeManager()
@@ -127,7 +127,6 @@ class AcidORM extends Nette\Object{
     public function getFacade($name)
     {
     	$facade = $this->facadeManager->getFacade($name);
-   		var_dump($facade);
     	return $this->facadeManager->getFacade($name);
     }
 
