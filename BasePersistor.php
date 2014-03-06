@@ -298,4 +298,21 @@ class BasePersistor extends Nette\Object{
 			$data[$object->{$key}] = $children;
 		}		
 	}	
+
+	public function getKeyValuePairsHierarchy(&$data, $parent = 0, $lvl = 1)
+	{
+		$q = $this->db->select('id, parent, name')
+				  	  ->from($this->table)
+				  	  ->where('parent = %i', $parent);
+		
+		$limiter = ' ';
+		for($i = 0; $i < $lvl; $i++){
+			$limiter.='--';
+		}
+
+		foreach ($q as $r) {
+			$data[$r->id] = $limiter . ' ' . $r->name;
+			$this->getKeyValuePairsHierarchy($data, $r->id, $lvl+1);
+		}
+	}	
 }
