@@ -47,14 +47,27 @@ class BasePersistor extends Nette\Object{
 		return $this->object;
 	}
 
+	public function getTable()
+	{
+		return $this->table;
+	}
+
 	public function insertUpdate(BaseObject $baseObject){
 		$array = $this->mapper->toArray($baseObject);
-		if($baseObject->id === null){
+		/*if($baseObject->id === null){
 			$this->db->insert($this->mapper->table, $array)->execute();
 			$baseObject->id = $this->db->insertId;
 		} else {
 			unset($array['id']);
 			$this->db->update($this->mapper->table, $array)->where('[id] = %i', $baseObject->id)->execute();
+		}*/
+		$this->db->query('insert ignore into [' . $this->mapper->table . '] ', $array, ' on duplicate key update %a', $array);
+		if($baseObject->id === null){
+			try{
+			$baseObject->id = $this->db->insertId();
+			} catch (\Exception $ex){
+				
+			}
 		}
 	}
 
