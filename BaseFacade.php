@@ -98,8 +98,9 @@ class BaseFacade extends Nette\Object{
 
 	public function &__call($name, $args)
 	{
+
 		if(method_exists($this, $name)){
-			$result = call_user_func([$this, $name], $args);
+			$result = call_user_func_array([$this, $name], $args);
 			return $result;
 		}
 
