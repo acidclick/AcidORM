@@ -7,7 +7,7 @@ use Nette,
 
 class BaseDatabase extends Nette\Object{
 
-	protected function createData($name, $properties, $dependencies)
+	protected function createData($name, $properties, $dependencies, $annotations = [])
 	{
 		$userDefinedProperties = '';
 		$userDefinedMethods = '';
@@ -37,7 +37,18 @@ class BaseDatabase extends Nette\Object{
 			}
 		}
 
-		$data  = sprintf("<?php\n\nnamespace Model\Data;\n\nuse Nette,\n\tAcidORM;\n\nclass %s extends AcidORM\BaseObject\n{\n\n", $name);
+		$data  = "<?php\n\nnamespace Model\Data;\n\nuse Nette,\n\tAcidORM,\n\tModel;\n\n";
+
+		if(sizeof($annotations) > 0){
+			$data .= "/**\n";
+			foreach ($annotations as $annotation) {
+				$data .= sprintf(" * %s\n", $annotation);	
+			}
+			$data .= " */\n\n";
+		}
+
+
+		$data .= sprintf("class %s extends AcidORM\BaseObject\n{\n\n", $name);
 
 		$data .= "\t// AcidORM generated properties\n\n";
 
@@ -133,6 +144,17 @@ class BaseDatabase extends Nette\Object{
 			}
 		}
 		return $dependencies;
+	}
+
+	protected function getAnnotations($text)
+	{
+		$annotations = [];
+		foreach(preg_split('/\n/', $text) as $line){
+			if(preg_match('/^((@plural)[^$]+)$/', $line, $regs)){
+				$annotations[] = $regs[1];
+			}
+		}
+		return $annotations;
 	}
 
 }
