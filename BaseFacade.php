@@ -196,7 +196,7 @@ class BaseFacade extends Nette\Object{
 		}
 
 		$count = 0;
-		$objects = $this->persistor->getAllByProperties($params, true, null, null, null, $count, sizeof($values) >= sizeof($calledProperties) + 1 ? $values[sizeof($calledProperties)] : null, sizeof($values) >= sizeof($calledProperties) + 2 ? $values[sizeof($calledProperties) + 1] : null);
+		$objects = $this->persistor->getAllByProperties($params, true, null, null, null, $count, sizeof($values) >= sizeof($params) + 1 ? $values[sizeof($params)] : null, sizeof($values) >= sizeof($params) + 2 ? $values[sizeof($params) + 1] : null);
 		foreach($objects as $object){
 			if($object !== null) $this->mapDependencies($object);
 		}
