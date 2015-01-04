@@ -53,15 +53,9 @@ class Postgre extends BaseDatabase implements Generators\IDatabaseFirst{
 				WHERE relkind = %s limit 1
 			', '\'"' . $rt->tablename . '"\'', 'r');
 
-			$dependencies = [];
-			foreach(preg_split('/\n/', $qfk->fetch()->note) as $line){
-				if(preg_match('/^([^:]+):((@oneToOne|@oneToMany|@manyToMany)[^$]+)$/', $line, $regs)){
-					$dependencies[] = (Object)[
-						'name' => $regs[1],
-						'annotation' => $regs[2]
-					];
-				}
-			}
+			$note = $qfk->fetch()->note;
+			$dependencies = $this->getDependencies($note);	
+			$annotations = $this->getAnnotations($note);		
 
 			$this->createData($rt->tablename, $properties, $dependencies);
 			$this->createPersistor($rt->tablename);
