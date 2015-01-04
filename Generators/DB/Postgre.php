@@ -57,7 +57,7 @@ class Postgre extends BaseDatabase implements Generators\IDatabaseFirst{
 			$dependencies = $this->getDependencies($note);	
 			$annotations = $this->getAnnotations($note);		
 
-			$this->createData($rt->tablename, $properties, $dependencies);
+			$this->createData($rt->tablename, $properties, $dependencies, $annotations);
 			$this->createPersistor($rt->tablename);
 			$this->createMapper($rt->tablename);
 			$this->createFacade($rt->tablename);
