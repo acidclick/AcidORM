@@ -19,7 +19,7 @@ class BasePersistor extends Nette\Object{
 		$this->db = $db;
 		$this->mapperManager = $mapperManager;
 
-		if(preg_match('/\\\([a-zA-Z]+)Persistor$/', $this->getReflection()->name, $regs)){
+		if(preg_match('/\\\([a-zA-Z0-9]+)Persistor$/', $this->getReflection()->name, $regs)){
 			$class = 'Model\\Data\\'.$regs[1];
 			$this->object = new $class;
 			$this->table = $regs[1];

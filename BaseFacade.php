@@ -21,7 +21,7 @@ class BaseFacade extends Nette\Object{
 	protected $parameters;
 
 	public function __construct(){
-		if(preg_match('/\\\([a-zA-Z]+)Facade$/', $this->getReflection()->name, $regs)){
+		if(preg_match('/\\\([a-zA-Z0-9]+)Facade$/', $this->getReflection()->name, $regs)){
 			$this->name = $regs[1];
 		}	
 	}

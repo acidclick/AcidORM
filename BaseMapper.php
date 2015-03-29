@@ -17,7 +17,7 @@ class BaseMapper extends Nette\Object{
 	private $oneToManyRelations;
 
 	public function __construct(){
-		if(preg_match('/([a-zA-Z]+)Mapper$/', $this->getReflection()->name, $regs)){
+		if(preg_match('/([a-zA-Z0-9]+)Mapper$/', $this->getReflection()->name, $regs)){
 			$className = $this->namespace . $regs[1];
 			$this->object = new $className();
 			$this->table = $regs[1];
