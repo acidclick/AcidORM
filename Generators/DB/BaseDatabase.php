@@ -53,6 +53,13 @@ class BaseDatabase extends Nette\Object{
 		$data .= "\t// AcidORM generated properties\n\n";
 
 		foreach($properties as $property){
+			if(isset($property->annotations) && sizeof($property->annotations) > 0){
+				$data .= sprintf("\t/**\n");
+				foreach($property->annotations as $annotation){
+					$data .= sprintf("\t* %s\n", $annotation);
+				}
+				$data .= sprintf("\t*/\n");
+			}
 			$data .= sprintf("\tprivate \$%s;\n", $property->name);
 		}
 
@@ -151,6 +158,19 @@ class BaseDatabase extends Nette\Object{
 		$annotations = [];
 		foreach(preg_split('/\n/', $text) as $line){
 			if(preg_match('/^((@plural)[^$]+)$/', $line, $regs)){
+				$annotations[] = $regs[1];
+			} else if(preg_match('/^(@label[^$]+)$/', $line, $regs)){
+				$annotations[] = $regs[1];
+			}
+		}
+		return $annotations;
+	}
+
+	protected function getPropertyAnnotations($text)
+	{
+		$annotations = [];
+		foreach(preg_split('/\n/', $text) as $line){
+			if(preg_match('/^(@label[^$]+)$/', $line, $regs)){
 				$annotations[] = $regs[1];
 			}
 		}
