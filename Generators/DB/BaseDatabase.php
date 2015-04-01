@@ -159,8 +159,6 @@ class BaseDatabase extends Nette\Object{
 		foreach(preg_split('/\n/', $text) as $line){
 			if(preg_match('/^((@plural)[^$]+)$/', $line, $regs)){
 				$annotations[] = $regs[1];
-			} else if(preg_match('/^(@label[^$]+)$/', $line, $regs)){
-				$annotations[] = $regs[1];
 			}
 		}
 		return $annotations;
@@ -171,6 +169,8 @@ class BaseDatabase extends Nette\Object{
 		$annotations = [];
 		foreach(preg_split('/\n/', $text) as $line){
 			if(preg_match('/^(@label[^$]+)$/', $line, $regs)){
+				$annotations[] = $regs[1];
+			} else if(preg_match('/^(@enum[^$]+)$/', $line, $regs)){
 				$annotations[] = $regs[1];
 			}
 		}
