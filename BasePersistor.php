@@ -55,7 +55,7 @@ class BasePersistor extends Nette\Object{
 	public function insertUpdate(BaseObject $baseObject){
 		$array = $this->mapper->toArray($baseObject);
 		
-		if($this->db->getConfig('driver') === 'mysqli'){
+		if($this->db->getConfig('driver') === 'mysqli' || $this->db->getConfig('driver') === 'mysql'){
 			$this->db->query('insert ignore into [' . $this->mapper->table . '] ', $array, ' on duplicate key update %a', $array);
 		} else {
 			if($baseObject->id === null){
