@@ -86,8 +86,8 @@ class BasePersistor extends Nette\Object{
 		$q = $this->createQuery($withDependencies, $dependencies);
 		$q = $q->where('[object].[id] = %i', $id);
 
-		if($q->count('*') > 0){
-			return $this->map($q->fetch(), $withDependencies, $dependencies);
+		foreach($q as $r){
+			return $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return null;
@@ -102,11 +102,8 @@ class BasePersistor extends Nette\Object{
 		if($limit !== null) $q = $q->limit($limit);
 		if($offset !== null) $q = $q->offset($offset);
 
-		if($q->count('*') > 0){
-			foreach($q as $r){
-				$objects[] = $this->map($r, $withDependencies, $dependencies);
-			}
-
+		foreach($q as $r){
+			$objects[] = $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return $objects;
@@ -118,8 +115,8 @@ class BasePersistor extends Nette\Object{
 		$q = $this->createQuery($withDependencies, $dependencies);
 		$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);	
 
-		if($q->count('*') > 0){
-			return $this->map($q->fetch(), $withDependencies, $dependencies);
+		foreach($q as $r){
+			return $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return null;		
@@ -133,9 +130,8 @@ class BasePersistor extends Nette\Object{
 			$q = $q->where('[object].['.$propertyName.'] ' . (is_array($propertyValue) ? ' in %in ' : ' = %s '), $propertyValue);	
 		}
 		
-
-		if($q->count('*') > 0){
-			return $this->map($q->fetch(), $withDependencies, $dependencies);
+		foreach($q as $r){
+			return $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return null;		
@@ -150,16 +146,13 @@ class BasePersistor extends Nette\Object{
 		if($orderBy){
 			$q = $q->orderBy('[' . $orderBy . '] ' . ($direction ? 'desc' : 'asc'));
 		}
-		$count = $q->count('*');
+		if($count !== null) $count = $q->count('*');
 
 		if($limit !== null) $q = $q->limit($limit);
 		if($offset !== null) $q = $q->offset($offset);			
 
-		if($count  > 0){
-			foreach($q as $r){
-				$objects[] = $this->map($r, $withDependencies, $dependencies);
-			}
-
+		foreach($q as $r){
+			$objects[] = $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return $objects;
@@ -177,16 +170,13 @@ class BasePersistor extends Nette\Object{
 			$q = $q->orderBy($orderBy . ' ' . ($direction === 1 ? 'desc' : 'asc'));
 		}
 
-		$count = $q->count('*');
+		if($count !== null) $count = $q->count('*');
 
 		if($limit !== null) $q = $q->limit($limit);
 		if($offset !== null) $q = $q->offset($offset);			
 
-		if($count  > 0){
-			foreach($q as $r){
-				$objects[] = $this->map($r, $withDependencies, $dependencies);
-			}
-
+		foreach($q as $r){
+			$objects[] = $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return $objects;
@@ -205,11 +195,8 @@ class BasePersistor extends Nette\Object{
 				  ->join('['.$manyToMany->table.'] [rel1]')->on(sprintf('[object].[id] = [rel1].[%s]', $manyToMany->foreignKey))
 				  ->where(sprintf('[rel1].[%s] = %%s', $manyToMany->column), $value);
 
-		if($q->count('*') > 0){
-			foreach($q as $r){
-				$objects[] = $this->map($r, $withDependencies, $dependencies);
-			}
-
+		foreach($q as $r){
+			$objects[] = $this->map($r, $withDependencies, $dependencies);
 		}
 
 		return $objects;
