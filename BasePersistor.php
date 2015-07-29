@@ -304,20 +304,25 @@ class BasePersistor extends Nette\Object{
 		}		
 	}	
 
-	public function getKeyValuePairsHierarchy(&$data, $parent = 0, $lvl = 1)
+	public function getKeyValuePairsHierarchy(&$data, $parent = 0, $lvl = 1, $parentText = '')
 	{
 		$q = $this->db->select('id, parent, name')
 				  	  ->from($this->table)
 				  	  ->where('parent = %i', $parent);
-		
-		$limiter = ' ';
-		for($i = 0; $i < $lvl; $i++){
-			$limiter.='--';
+		if($lvl !== false){
+			$delimiter = '';
+			for($i = 0; $i < $lvl; $i++){
+				$delimiter.='--';
+			}		
+			$delimiter .= ' ';	
+		} else {
+			$delimiter = $parentText . ($parentText !== '' ? ' > ' : '') ;
 		}
 
 		foreach ($q as $r) {
-			$data[$r->id] = $limiter . ' ' . $r->name;
-			$this->getKeyValuePairsHierarchy($data, $r->id, $lvl+1);
+			$data[$r->id] = $delimiter . $r->name;
+			$this->getKeyValuePairsHierarchy($data, $r->id, $lvl === false ? $lvl : $lvl+1, $data[$r->id]);
 		}
+		
 	}	
 }

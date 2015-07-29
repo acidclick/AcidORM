@@ -266,9 +266,14 @@ class BaseFacade extends Nette\Object{
 		$this->cache->clean([Nette\Caching\Cache::TAGS => [$tag]]);
 	}
 
-	public function getKeyValuePairsHierarchy(){
+	public function getKeyValuePairsHierarchy($full = false){
 		$data = [];
-		$this->getPersistor()->getKeyValuePairsHierarchy($data);
+		if($full){
+			$this->getPersistor()->getKeyValuePairsHierarchy($data, 0, false);
+		} else {
+			$this->getPersistor()->getKeyValuePairsHierarchy($data);
+		}
+		
 		return $data;
 	}	
 
