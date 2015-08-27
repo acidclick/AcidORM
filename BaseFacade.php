@@ -86,6 +86,11 @@ class BaseFacade extends Nette\Object{
 		return $keyValuePairs;
 	}
 
+	public function getKeyValue($key = 'id', $value = 'name', $restrictions = [])
+	{
+		return $this->persistor->getKeyValuePairs($key, $value, $restrictions);
+	}
+
 	public function setFacadeManager(Managers\FacadeManager &$facadeManager)
 	{
 		$this->facadeManager = $facadeManager;

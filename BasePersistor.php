@@ -278,11 +278,13 @@ class BasePersistor extends Nette\Object{
 		return $this->cache;
 	}	
 
-	public function getKeyValuePairs($key = 'id', $value = 'name')
+	public function getKeyValuePairs($key = 'id', $value = 'name', $restrictions = [])
 	{
 		$q = $this->db->select(sprintf('[%s], [%s]', $key, $value))
 					  ->from($this->mapper->table);
-					  
+		foreach($restrictions as $restrictionKey => $restrictionValue){
+			$q->where('%n = %s', $restrictionKey, $restrictionValue);
+		}
 		return $q->fetchPairs($key, $value);
 	}
 
