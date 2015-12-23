@@ -36,7 +36,7 @@ class BasePersistor extends Nette\Object{
 	}
 
 	public function getMapperManager(){
-		return $this->mapperManager();
+		return $this->mapperManager;
 	}
 
 	public function getMapper(){
