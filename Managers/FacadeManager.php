@@ -78,7 +78,8 @@ class FacadeManager extends BaseManager{
     		return $facade;
     	}
 
-    	parent::__get($name);
+    	$var = parent::__get($name);
+    	return $var;
     }	
 
 }
