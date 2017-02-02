@@ -1,9 +1,9 @@
 <?php
 
-namespace AcidORM\Generators\DB;
+namespace Acidclick\AcidORM\Generators\DB;
 
 use Nette,
-	AcidORM\Generators;
+	Acidclick\AcidORM\Generators;
 
 class Mysql extends BaseDatabase implements Generators\IDatabaseFirst{
 

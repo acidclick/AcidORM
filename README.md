@@ -1,4 +1,4 @@
-# AcidORM
+# Acidclick\AcidORM
 
 ## config.neon
 ```php
@@ -6,7 +6,7 @@
 	services:		
 
 		acidORM:
-			class: AcidORM\AcidORM
+			class: Acidclick\AcidORM
 			setup:
 				- setDb(@dibi.connection)
 				- setCacheProvider(@cacheProvider)

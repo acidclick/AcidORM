@@ -1,10 +1,10 @@
 <?php
 
-namespace AcidORM\Utils;
+namespace Acidclick\AcidORM\Utils;
 
 use Nette,
-	AcidORM\Managers,
-	AcidORM\Interfaces\IHistoryProxy;
+	Acidclick\AcidORM\Managers,
+	Acidclick\AcidORM\Interfaces\IHistoryProxy;
 
 class HistoryComparer extends Nette\Object{
 

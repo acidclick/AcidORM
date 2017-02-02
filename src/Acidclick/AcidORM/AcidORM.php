@@ -1,9 +1,9 @@
 <?php
 
-namespace AcidORM;
+namespace Acidclick\AcidORM;
 
 use Nette,
-	AcidORM\Managers;
+	Acidclick\AcidORM\Managers;
 
 class AcidORM extends Nette\Object{
 
