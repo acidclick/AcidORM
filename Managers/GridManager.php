@@ -19,7 +19,7 @@ class GridManager extends BaseManager{
 		return $this->data[$className];
 	}
 
-	public function setDb(\DibiConnection $db){
+	public function setDb(\Dibi\Connection $db){
 		$this->db = $db;
 	}
 

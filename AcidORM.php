@@ -19,7 +19,7 @@ class AcidORM extends Nette\Object{
 
 	private $generators = [];
 
-	public function setDb(\DibiConnection $db)
+	public function setDb(\Dibi\Connection $db)
 	{
 		$this->db = $db;
 	}
