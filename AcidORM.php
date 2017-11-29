@@ -130,6 +130,12 @@ class AcidORM extends Nette\Object{
     	return $this->facadeManager->getFacade($name);
     }
 
+    public function getGrid($name)
+    {
+    	return $this->gridManager->getGrid($name);
+    }
+
+
     public function getMapperManager()
     {
     	return $this->mapperManager;
