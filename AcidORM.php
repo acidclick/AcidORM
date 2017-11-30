@@ -135,6 +135,15 @@ class AcidORM extends Nette\Object{
     	return $this->gridManager->getGrid($name);
     }
 
+    public function getMapper($name)
+    {
+    	return $this->mapperManager->getMapper($name);
+    }
+
+    public function getPersistor($name)
+    {
+    	return $this->persistorManager->getPersistor($name);
+    }
 
     public function getMapperManager()
     {
