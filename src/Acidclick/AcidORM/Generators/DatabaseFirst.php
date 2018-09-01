@@ -1,6 +1,6 @@
 <?php
 
-namespace AcidORM\Generators;
+namespace Acidclick\AcidORM\Generators;
 
 use Nette;
 
@@ -43,7 +43,7 @@ class DatabaseFirst extends Nette\Object implements IDatabaseFirst{
 
 	public function createAdapter()
 	{
-		$class = 'AcidORM\\Generators\\DB\\' . Nette\Utils\Strings::firstUpper($this->databaseDriver);
+		$class = 'Acidclick\AcidORM\\Generators\\DB\\' . Nette\Utils\Strings::firstUpper($this->databaseDriver);
 		$this->adapter = new $class();
 		$this->adapter->db = $this->db;
 		$this->adapter->appDir = $this->appDir;

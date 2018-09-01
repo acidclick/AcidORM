@@ -1,9 +1,9 @@
 <?php
 
-namespace AcidORM;
+namespace Acidclick\AcidORM;
 
 use Nette,
-	AcidORM\Managers;
+	Acidclick\AcidORM\Managers;
 
 class AcidORM extends Nette\Object{
 
@@ -19,7 +19,7 @@ class AcidORM extends Nette\Object{
 
 	private $generators = [];
 
-	public function setDb(\DibiConnection $db)
+	public function setDb(\Dibi\Connection $db)
 	{
 		$this->db = $db;
 	}
