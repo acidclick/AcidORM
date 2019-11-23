@@ -5,7 +5,12 @@ namespace AcidORM\Generators\DB;
 use Nette,
 	AcidORM\Generators;
 
-class Postgre extends BaseDatabase implements Generators\IDatabaseFirst{
+/**
+ * @property \DibiConnection $db
+ * @property string $appDir
+ */
+class Postgre extends BaseDatabase implements Generators\IDatabaseFirst
+{
 
 	private $db;
 	private $appDir;

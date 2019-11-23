@@ -4,8 +4,15 @@ namespace AcidORM\DB\Relationships;
 
 use Nette;
 
-class OneToOne extends Nette\Object{
-
+/**
+ * @property string $className
+ * @property string $propertyName
+ * @property string $canBeNull
+ */
+class OneToOne
+{
+	use \Nette\SmartObject;
+	
 	private $className;
 	private $propertyName;
 	private $canBeNull;

@@ -5,7 +5,9 @@ namespace AcidORM\Generators\DB;
 use Nette,
 	AcidORM\Generators;
 
-class BaseDatabase extends Nette\Object{
+class BaseDatabase
+{
+	use \Nette\SmartObject;
 
 	protected function createData($name, $properties, $dependencies, $annotations = [])
 	{

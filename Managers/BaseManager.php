@@ -3,9 +3,13 @@
 namespace AcidORM\Managers;
 
 use Nette;
-
-class BaseManager extends Nette\Object{
-
+/**
+ * @property array $data
+ */
+class BaseManager
+{
+	use \Nette\SmartObject;
+	
 	protected $data;
 
 	protected function getData(){

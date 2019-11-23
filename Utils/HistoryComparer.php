@@ -6,12 +6,15 @@ use Nette,
 	AcidORM\Managers,
 	AcidORM\Interfaces\IHistoryProxy;
 
-class HistoryComparer extends Nette\Object{
-
+class HistoryComparer
+{
+	use \Nette\SmartObject;
+	
 	public static function hasChanges($objectOld, $objectNew)
 	{
 		$changes = false;
-		foreach($objectNew->getReflection()->getProperties() as $property){
+		$reflection = Nette\Reflection\ClassType::from($objectNew);
+		foreach($reflection->getProperties() as $property){
 			if($property->hasAnnotation('label')){
 				if(is_array($objectNew->{$property->name})){
 					$tmp1 = $objectNew->{$property->name};
@@ -41,7 +44,8 @@ class HistoryComparer extends Nette\Object{
 		Nette\Diagnostics\Debugger::dump($objectNew);
 		exit;*/
 		$changes = '';
-		foreach($objectNew->getReflection()->getProperties() as $property){
+		$reflection = Nette\Reflection\ClassType::from($objectNew);
+		foreach($reflection->getProperties() as $property){
 			if($property->hasAnnotation('label')){
 				if(is_array($objectNew->{$property->name})){
 					$tmp1 = $objectNew->{$property->name};

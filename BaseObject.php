@@ -4,12 +4,15 @@ namespace AcidORM;
 
 use Nette;
 
-class BaseObject extends Nette\Object implements \JsonSerializable{
-
+class BaseObject implements \JsonSerializable
+{
+	use \Nette\SmartObject;
+	
 	public function jsonSerialize()
 	{
 		$data = [];
-		foreach($this->getReflection()->getProperties() as $property){
+		$reflection = Nette\Reflection\ClassType::from($this);
+		foreach($reflection->getProperties() as $property){
 			$data[$property->name] = $this->{$property->name};
 		}
 		return $data;
@@ -21,8 +24,8 @@ class BaseObject extends Nette\Object implements \JsonSerializable{
 			return $this->label;
 		} else if($name !== null){
 			if(property_exists($this, $name)){
-				if($this->reflection->getProperty($name)->hasAnnotation('label')){
-					return $this->reflection->getProperty($name)->getAnnotation('label');
+				if(Nette\Reflection\ClassType::from($this)->getProperty($name)->hasAnnotation('label')){
+					return Nette\Reflection\ClassType::from($this)->getProperty($name)->getAnnotation('label');
 				}
 			}
 		}

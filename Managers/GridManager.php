@@ -3,8 +3,12 @@
 namespace AcidORM\Managers;
 
 use Nette;
-
-class GridManager extends BaseManager{
+/**
+ * @property string $namespace
+ * @property \DibiConnection $db
+ */
+class GridManager extends BaseManager
+{
 
 	protected $namespace = 'Model\\Grids\\';
 

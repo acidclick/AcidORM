@@ -3,9 +3,17 @@
 namespace AcidORM\Managers;
 
 use Nette;
-
-class FacadeManager extends BaseManager{
-
+/**
+ * @property string $namespace
+ * @property PersistorManager $persistorManager
+ * @property MapperManager $mapperManager
+ * @property Nette\Caching\Cache $cache
+ * @property array $parameters
+ */
+class FacadeManager extends BaseManager
+{
+	use \Nette\SmartObject;
+	
 	protected $namespace = 'Model\\Facades\\';
 
 	protected $persistorManager;
@@ -77,9 +85,6 @@ class FacadeManager extends BaseManager{
     		$facade = $this->getFacade(Nette\Utils\Strings::firstUpper($regs[1]));
     		return $facade;
     	}
-
-    	$var = parent::__get($name);
-    	return $var;
     }	
 
 }

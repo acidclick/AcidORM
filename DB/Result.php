@@ -4,8 +4,13 @@ namespace AcidORM\DB;
 
 use Nette;
 
-class Result extends Nette\Object{
-
+/**
+ * @property array $result
+ */
+class Result
+{
+	use \Nette\SmartObject;
+	
 	private $result;
 
 	public function __construct($result){

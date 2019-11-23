@@ -4,8 +4,18 @@ namespace AcidORM;
 
 use Nette;
 
-class BasePersistor extends Nette\Object{
+/**
+ * @property \DibiConnection $db
+ * @property BaseObject $object
+ * @property BaseMapper $mapper
+ * @property string $table
+ * @property AcidORM\Managers\MapperManager $mapperManager
+ * @property Nette\Caching\Cache $cache
+ */
+class BasePersistor
+{
 
+	use \Nette\SmartObject;
 	private $db;
 	private $object;
 	private $mapper;
@@ -18,8 +28,8 @@ class BasePersistor extends Nette\Object{
 	public function __construct($db, $mapperManager){
 		$this->db = $db;
 		$this->mapperManager = $mapperManager;
-
-		if(preg_match('/\\\([a-zA-Z0-9]+)Persistor$/', $this->getReflection()->name, $regs)){
+		$reflection = Nette\Reflection\ClassType::from($this);
+		if(preg_match('/\\\([a-zA-Z0-9]+)Persistor$/', $reflection->name, $regs)){
 			$class = 'Model\\Data\\'.$regs[1];
 			$this->object = new $class;
 			$this->table = $regs[1];
@@ -183,7 +193,7 @@ class BasePersistor extends Nette\Object{
 	}	
 
 	public function getAllForOneToMany(DB\Relationships\OneToMany $oneToMany, $value, $withDependencies = false, $dependencies = null){
-		return $this->getAllByProperty($oneToMany->propertyName, $value, $withDependencies, $dependencies);
+		return $this->getAllByProperty($oneToMany->getPropertyName(), $value, $withDependencies, $dependencies);
 	}
 
 	public function getAllForManyToMany(DB\Relationships\ManyToMany $manyToMany, $value, $withDependencies = false, $dependencies = null){
@@ -226,7 +236,8 @@ class BasePersistor extends Nette\Object{
 
 		$data  = [];
 		foreach ($dependencies as $propertyName) {
-			$property = $this->object->getReflection()->getProperty($propertyName);
+			$reflection = Nette\Reflection\ClassType::from($this->object);
+			$property = $reflection->getProperty($propertyName);
 			if($property->hasAnnotation('oneToOne')){
 				$annotation = $property->getAnnotation('oneToOne');
 				$data[$propertyName] = new DB\Relationships\OneToOne(

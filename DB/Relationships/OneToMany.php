@@ -4,7 +4,13 @@ namespace AcidORM\DB\Relationships;
 
 use Nette;
 
-class OneToMany extends Nette\Object{
+/**
+ * @property string $foreignKey
+ * @property string $className
+ */
+class OneToMany
+{
+	use \Nette\SmartObject;
 
 	private $className;
 	private $foreignKey;

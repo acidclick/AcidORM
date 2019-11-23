@@ -3,8 +3,11 @@
 namespace AcidORM\Managers;
 
 use Nette;
-
-class MapperManager extends BaseManager{
+/**
+ * @property string $namespace
+ */
+class MapperManager extends BaseManager
+{
 
 	protected $namespace = 'Model\\Mappers\\';
 

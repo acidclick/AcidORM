@@ -4,8 +4,12 @@ namespace AcidORM\Generators\DB;
 
 use Nette,
 	AcidORM\Generators;
-
-class Mysql extends BaseDatabase implements Generators\IDatabaseFirst{
+/**
+ * @property \DibiConnection $db
+ * @property string $appDir
+ */
+class Mysql extends BaseDatabase implements Generators\IDatabaseFirst
+{
 
 	private $db;
 	private $appDir; 

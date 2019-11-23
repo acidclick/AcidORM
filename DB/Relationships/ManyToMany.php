@@ -4,9 +4,16 @@ namespace AcidORM\DB\Relationships;
 
 use Nette;
 
-class ManyToMany extends Nette\Object
+/**
+ * @property string $table
+ * @property string $foreignKey
+ * @property string $column
+ * @property string $className
+ */
+class ManyToMany
 {
-
+	use \Nette\SmartObject;
+	
 	private $table;
 	private $foreignKey;
 	private $column;

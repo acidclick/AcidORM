@@ -6,8 +6,19 @@ use Nette,
 	AcidORM\Managers,
 	AcidORM\Interfaces\IHistoryProxy;
 
-class BaseFacade extends Nette\Object{
-
+/**
+ * @property string $name
+ * @property Managers\PersistorManager $persistorManager
+ * @property Managers\MapperManager $mapperManager
+ * @property Nette\Caching\Cache $cache
+ * @property Managers\FacadeManager $facadeManager
+ * @property array $parameters
+ * @property BasePersistor $persistor
+ */
+class BaseFacade
+{
+	use \Nette\SmartObject;
+	
 	protected $name;
 
 	protected $persistorManager;
@@ -21,7 +32,8 @@ class BaseFacade extends Nette\Object{
 	protected $parameters;
 
 	public function __construct(){
-		if(preg_match('/\\\([a-zA-Z0-9]+)Facade$/', $this->getReflection()->name, $regs)){
+		$reflection = Nette\Reflection\ClassType::from($this);
+		if(preg_match('/\\\([a-zA-Z0-9]+)Facade$/', $reflection->name, $regs)){
 			$this->name = $regs[1];
 		}	
 	}
@@ -157,7 +169,7 @@ class BaseFacade extends Nette\Object{
 		$reflection = new Nette\Reflection\ClassType('Model\\Data\\' . $this->name);
 		$plural = $reflection->getAnnotation('plural');
 
-		return $plural === $class;
+		return $class === $this->name . 's' || $plural === $class;
 	}
 
 	private function getSingular($class)
@@ -250,7 +262,8 @@ class BaseFacade extends Nette\Object{
 				$oldObject = new $namespacedClass();
 			}
 			$newObject = $this->simpleGetBy($class, 'Id', [$object->id]);
-			foreach($newObject->getReflection()->getProperties() as $property){
+			$reflection = Nette\Reflection\ClassType::from($newObject);
+			foreach($reflection->getProperties() as $property){
 				if($property->hasAnnotation('label') && $property->hasAnnotation('historyDontMap')) $oldObject->{$property->name} = $object->{$property->name};
 			}
 			if(Utils\HistoryComparer::hasChanges($oldObject, $newObject)){

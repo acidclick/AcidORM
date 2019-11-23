@@ -4,9 +4,17 @@ namespace AcidORM;
 
 use Nette,
 	AcidORM\DB;
-
-class BaseMapper extends Nette\Object{
-
+/**
+ * @property BaseObject $object
+ * @property string $namespace
+ * @property string $table
+ * @property array $oneToOneRelations
+ * @property array $manyToManyRelations
+ * @property array $oneToManyRelations
+ */
+class BaseMapper
+{
+	use \Nette\SmartObject;
 	private $namespace = 'Model\\Data\\';
 
 	private $object;
@@ -17,7 +25,8 @@ class BaseMapper extends Nette\Object{
 	private $oneToManyRelations;
 
 	public function __construct(){
-		if(preg_match('/([a-zA-Z0-9]+)Mapper$/', $this->getReflection()->name, $regs)){
+		$reflection = Nette\Reflection\ClassType::from($this);
+		if(preg_match('/([a-zA-Z0-9]+)Mapper$/', $reflection->name, $regs)){
 			$className = $this->namespace . $regs[1];
 			$this->object = new $className();
 			$this->table = $regs[1];
@@ -26,7 +35,7 @@ class BaseMapper extends Nette\Object{
 
 	public function toArray(BaseObject $object){
 		$array = [];
-		$reflection = $this->object->getReflection();		
+		$reflection = Nette\Reflection\ClassType::from($this->object);		
 		foreach($reflection->getProperties() as $property){
 			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('oneToMany') && !$property->hasAnnotation('manyToMany') && !$property->hasAnnotation('dontMap')){
 				if($object->{$property->name} !== null) $array[$property->name] = $object->{$property->name};	
@@ -39,7 +48,7 @@ class BaseMapper extends Nette\Object{
 	public function map($data){
 		if(sizeof($data) === 0) return null;
 		$object = clone $this->object;
-		$reflection = $object->getReflection();
+		$reflection = Nette\Reflection\ClassType::from($object);
 		foreach($data as $property => $value){
 			if($reflection->hasProperty($property)){
 				$object->{$property} = $value;
@@ -54,7 +63,8 @@ class BaseMapper extends Nette\Object{
 
 	public function getColumns($alias){
 		$columns = [];
-		foreach($this->object->getReflection()->getProperties() as $property){
+		$reflection = Nette\Reflection\ClassType::from($this->object);
+		foreach($reflection->getProperties() as $property){
 			if(!$property->hasAnnotation('oneToOne') && !$property->hasAnnotation('manyToMany') && !$property->hasAnnotation('oneToMany') && !$property->hasAnnotation('dontMap')){
 				$columns[$alias . '.' . $property->name] =  $alias . '_' . $property->name;
 			}
@@ -65,7 +75,8 @@ class BaseMapper extends Nette\Object{
 	public function getManyToManyRelationships(){
 		if($this->manyToManyRelations === null){
 			$this->manyToManyRelations = [];
-			foreach($this->object->getReflection()->getProperties() as $property){
+			$reflection = Nette\Reflection\ClassType::from($this->object);
+			foreach($reflection->getProperties() as $property){
 				if($property->hasAnnotation('manyToMany')){
 					$annotation = $property->getAnnotation('manyToMany');
 					$manyToMany = new DB\Relationships\ManyToMany(
@@ -84,7 +95,8 @@ class BaseMapper extends Nette\Object{
 	public function getOneToOneRelationships(){
 		if($this->oneToOneRelations === null){
 			$this->oneToOneRelations = [];
-			foreach($this->object->getReflection()->getProperties() as $property){
+			$reflection = Nette\Reflection\ClassType::from($this->object);
+			foreach($reflection->getProperties() as $property){
 				if($property->hasAnnotation('oneToOne')){
 					$annotation = $property->getAnnotation('oneToOne');
 					$oneToOne = new DB\Relationships\OneToOne(
@@ -102,7 +114,8 @@ class BaseMapper extends Nette\Object{
 	public function getOneToManyRelationships(){
 		if($this->oneToManyRelations === null){
 			$this->oneToManyRelations = [];
-			foreach($this->object->getReflection()->getProperties() as $property){
+			$reflection = Nette\Reflection\ClassType::from($this->object);
+			foreach($reflection->getProperties() as $property){
 				if($property->hasAnnotation('oneToMany')){
 					$annotation = $property->getAnnotation('oneToMany');
 					$oneToMany = new DB\Relationships\OneToMany(

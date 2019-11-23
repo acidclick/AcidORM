@@ -3,8 +3,14 @@
 namespace AcidORM\Managers;
 
 use Nette;
-
-class PersistorManager extends BaseManager{
+/**
+ * @property MapperManager $mapperManager
+ * @property string $namespace
+ * @property \DibiConnection $db
+ * @property Nette\Caching\Cache $cache
+ */
+class PersistorManager extends BaseManager
+{
 
 	protected $namespace = 'Model\\Persistors\\';
 

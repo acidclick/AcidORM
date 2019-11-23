@@ -3,9 +3,18 @@
 namespace AcidORM\Generators;
 
 use Nette;
+use AcidORM\Generators\DB\BaseDatabase;
 
-class DatabaseFirst extends Nette\Object implements IDatabaseFirst{
-
+/**
+ * @property \DibiConnection $db
+ * @property string $databaseDriver
+ * @property BaseDatabase $adapter
+ * @property string $appDir
+ */
+class DatabaseFirst implements IDatabaseFirst
+{
+	use \Nette\SmartObject;
+	
 	private $db;
 	private $databaseDriver;
 	private $adapter;

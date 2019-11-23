@@ -5,8 +5,20 @@ namespace AcidORM;
 use Nette,
 	AcidORM\Managers;
 
-class AcidORM extends Nette\Object{
+/**
+ * @property Managers\PersistorManager $persistorManager
+ * @property Managers\MapperManager $mapperManager
+ * @property Managers\GridManager $gridManager
+ * @property Managers\FacadeManager $facadeManager
+ * @property \DibiConnection $db
+ * @property Nette\Caching\Cache
+ * @property array $parameters
+ * @property array $generators
+ */
 
+class AcidORM
+{
+	use \Nette\SmartObject;
 	private $persistorManager;
 	private $mapperManager;
 	private $gridManager;
@@ -116,7 +128,8 @@ class AcidORM extends Nette\Object{
     		return $grid;
     	}
 
-    	return parent::__get($name);
+    	if(isset($this->{$name})) return $this->{$name};
+    	throw new \Exception;
     }
 
     public function getFacadeManager()
