@@ -5,7 +5,7 @@ namespace AcidORM;
 use Nette;
 
 /**
- * @property \DibiConnection $db
+ * @property \Dibi\Connection $db
  * @property BaseObject $object
  * @property BaseMapper $mapper
  * @property string $table

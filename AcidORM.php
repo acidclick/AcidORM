@@ -10,7 +10,7 @@ use Nette,
  * @property Managers\MapperManager $mapperManager
  * @property Managers\GridManager $gridManager
  * @property Managers\FacadeManager $facadeManager
- * @property \DibiConnection $db
+ * @property \Dibi\Connection $db
  * @property Nette\Caching\Cache
  * @property array $parameters
  * @property array $generators
@@ -31,7 +31,7 @@ class AcidORM
 
 	private $generators = [];
 
-	public function setDb(\DibiConnection $db)
+	public function setDb(\Dibi\Connection $db)
 	{
 		$this->db = $db;
 	}
